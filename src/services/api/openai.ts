@@ -7,6 +7,7 @@ const openAIClient = axios.create({
     'Authorization': `Bearer ${API_CONFIG.OPENAI_API_KEY}`,
     'Content-Type': 'application/json',
   },
+  timeout: 30000,
 });
 
 export interface ChatCompletionRequest {
@@ -42,6 +43,7 @@ export interface ChatCompletionResponse {
 export const openAIService = {
   async askQuestion(question: string): Promise<ChatCompletionResponse> {
     try {
+      console.log('OpenAI Request:', { question });
       const response = await openAIClient.post<ChatCompletionResponse>('/chat/completions', {
         model: 'gpt-3.5-turbo',
         messages: [
@@ -57,9 +59,10 @@ export const openAIService = {
         temperature: 0.7,
         max_tokens: 1000,
       });
-
+        console.log('OpenAI Response:', response.data);
       return response.data;
     } catch (error) {
+      console.error('OpenAI Error:', error);
       if (axios.isAxiosError(error)) {
         throw new Error(error.response?.data?.error?.message || 'Falha ao obter resposta do OpenAI');
       }
