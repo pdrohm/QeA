@@ -64,6 +64,7 @@ export function useHomeScreen() {
       }
     };
 
+
     const handleSubmit = async () => {
       if (!question.trim() || isLoading) return;
   
@@ -162,6 +163,10 @@ export function useHomeScreen() {
       }
     };
 
+    const handleClearPress = () => {
+      setQuestion('');
+    };
+
     return {
       question,
       isLoading,
@@ -171,6 +176,7 @@ export function useHomeScreen() {
       handleSubmit,
       setQuestion,
       handleMicrophonePress,
+      handleClearPress,
       isSimulator,
       pulseAnim,
       opacityAnim,

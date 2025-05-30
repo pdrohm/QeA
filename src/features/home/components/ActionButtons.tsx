@@ -5,11 +5,12 @@ import React from 'react';
 import { ActivityIndicator, TouchableOpacity } from 'react-native';
 import Animated from 'react-native-reanimated';
 
-type IconName = 'image-search' | 'send' | 'microphone' | 'microphone-off';
+type IconName = 'image-search' | 'send' | 'microphone' | 'microphone-off' | 'delete';
 type SpeechStatus = 'idle' | 'listening' | 'processing' | 'error';
 
 interface ActionButtonsProps {
   handleMicrophonePress: () => void;
+  handleClearPress: () => void;
   speechStatus: SpeechStatus;
   isListening: boolean;
   pulseStyle: any;
@@ -19,7 +20,8 @@ interface ActionButtonsProps {
 }
 
 export const ActionButtons: React.FC<ActionButtonsProps> = ({ 
-  handleMicrophonePress, 
+  handleMicrophonePress,
+  handleClearPress,
   speechStatus, 
   isListening, 
   pulseStyle, 
@@ -73,5 +75,17 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         )}
       </TouchableOpacity>
     </Animated.View>
+
+    <TouchableOpacity 
+      onPress={handleClearPress}
+      style={{
+        padding: theme.spacing.s,
+        marginLeft: theme.spacing.xl,
+        backgroundColor: theme.colors.mainBackground,
+        borderRadius: theme.borderRadii.m,
+      }}
+    >
+      <MaterialCommunityIcons name="broom" size={24} color={theme.colors.error} />
+    </TouchableOpacity>
   </Box>
 ); 
