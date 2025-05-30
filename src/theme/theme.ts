@@ -16,6 +16,7 @@ const theme = createTheme({
     black: palette.black,
     gray: palette.gray,
     lightGray: palette.lightGray,
+    error: palette.error,
   },
   spacing: {
     xs: 4,

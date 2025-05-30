@@ -1,8 +1,7 @@
 import HomeScreen from '@/src/features/home';
 
-export default function RouteHomeScreen() {
+const Index = () => {
   return <HomeScreen />;
-} 
+};
 
-
-
+export default Index; 

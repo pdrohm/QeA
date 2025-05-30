@@ -9,14 +9,24 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Permita que o $(PRODUCT_NAME) acesse seu microfone para entrada de voz",
+        "NSSpeechRecognitionUsageDescription": "Permita que o $(PRODUCT_NAME) use reconhecimento de fala para entrada de voz"
+      },
+      "bundleIdentifier": "com.pdrohm.meuguru"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "RECORD_AUDIO",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.pdrohm.meuguru"
     },
     "web": {
       "bundler": "metro",
@@ -33,7 +43,9 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-speech-recognition",
+      "expo-dev-client"
     ],
     "experiments": {
       "typedRoutes": true
