@@ -1,12 +1,18 @@
 import { useQuestionsStore } from '@/src/stores/questionsStore';
-import { useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 export function useHistoryScreen() {
     const { questions, loadQuestions } = useQuestionsStore();
 
-    useEffect(() => {
-      loadQuestions();
-    }, [loadQuestions]);
+    useFocusEffect(
+        useCallback(() => {
+            const loadData = async () => {
+                await loadQuestions();
+            };
+            loadData();
+        }, [loadQuestions])
+    );
 
     return {
         questions,

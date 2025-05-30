@@ -1,12 +1,12 @@
-import { create } from 'zustand';
-import { openAIService } from '../services/api/openai';
-import { questionsStorage } from '../services/storage/questionsStorage';
-import { Question, QuestionStore } from '../types';
+import { create } from "zustand";
+import { openAIService } from "../services/api/openai";
+import { questionsStorage } from "../services/storage/questionsStorage";
+import { Question, QuestionStore } from "../types";
 
 export const useQuestionsStore = create<QuestionStore>((set, get) => ({
   questions: [],
   favorites: [],
-  
+
   addQuestion: async (questionData) => {
     try {
       const newQuestion: Question = {
@@ -20,12 +20,12 @@ export const useQuestionsStore = create<QuestionStore>((set, get) => ({
       await questionsStorage.saveQuestion(newQuestion);
 
       set((state) => ({
-        questions: [...state.questions, newQuestion],
+        questions: [newQuestion, ...state.questions],
       }));
 
       return newQuestion;
     } catch (error) {
-      console.error('Erro ao adicionar pergunta:', error);
+      console.error("Erro ao adicionar pergunta:", error);
       throw error;
     }
   },
@@ -50,8 +50,12 @@ export const useQuestionsStore = create<QuestionStore>((set, get) => ({
           q.id === id ? updatedQuestion : q
         ),
       }));
+
+      if ("isFavorite" in updates) {
+        get().getFavoriteQuestions();
+      }
     } catch (error) {
-      console.error('Erro ao atualizar pergunta:', error);
+      console.error("Erro ao atualizar pergunta:", error);
       throw error;
     }
   },
@@ -63,8 +67,10 @@ export const useQuestionsStore = create<QuestionStore>((set, get) => ({
       set((state) => ({
         questions: state.questions.filter((q) => q.id !== id),
       }));
+
+      get().getFavoriteQuestions();
     } catch (error) {
-      console.error('Erro ao deletar pergunta:', error);
+      console.error("Erro ao deletar pergunta:", error);
       throw error;
     }
   },
@@ -87,8 +93,9 @@ export const useQuestionsStore = create<QuestionStore>((set, get) => ({
           q.id === id ? updatedQuestion : q
         ),
       }));
+      get().getFavoriteQuestions();
     } catch (error) {
-      console.error('Erro ao alternar favorito:', error);
+      console.error("Erro ao alternar favorito:", error);
       throw error;
     }
   },
@@ -97,14 +104,15 @@ export const useQuestionsStore = create<QuestionStore>((set, get) => ({
     try {
       const questions = await questionsStorage.getQuestions();
       set({ questions });
+      get().getFavoriteQuestions();
     } catch (error) {
-      console.error('Erro ao carregar perguntas:', error);
+      console.error("Erro ao carregar perguntas:", error);
       throw error;
     }
   },
 
-  getFavoriteQuestions: async () => {
-    const questions = await questionsStorage.getQuestions();
+  getFavoriteQuestions: () => {
+    const questions = get().questions;
     const favorites = questions.filter((q) => q.isFavorite);
     set({ favorites });
     return favorites;
@@ -120,8 +128,8 @@ export const useQuestionsStore = create<QuestionStore>((set, get) => ({
 
       await get().updateQuestion(id, { answer });
     } catch (error) {
-      console.error('Erro ao obter resposta:', error);
+      console.error("Erro ao obter resposta:", error);
       throw error;
     }
   },
-})); 
+}));

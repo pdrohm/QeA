@@ -1,20 +1,17 @@
 import { useQuestionsStore } from '@/src/stores/questionsStore';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
-
-import { useEffect } from 'react';
 export function useFavoritesScreen() {
-
     const { favorites, getFavoriteQuestions } = useQuestionsStore();
 
-
-    useEffect(() => {
-      getFavoriteQuestions();
-    }, [getFavoriteQuestions]);
-  
- 
+    useFocusEffect(
+        useCallback(() => {
+            getFavoriteQuestions();
+        }, [getFavoriteQuestions])
+    );
 
     return {
         favorites,
-        getFavoriteQuestions
     }
 }

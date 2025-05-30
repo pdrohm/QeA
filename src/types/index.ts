@@ -16,7 +16,7 @@ export interface QuestionStore {
   toggleFavorite: (id: string) => Promise<void>;
   loadQuestions: () => Promise<void>;
   getAnswer: (id: string) => Promise<void>;
-  getFavoriteQuestions: () => Promise<Question[]>;
+  getFavoriteQuestions: () => Question[];
 }
 
 export interface ApiResponse {
