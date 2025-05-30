@@ -15,7 +15,13 @@ export interface ChatCompletionRequest {
   model: string;
   messages: {
     role: 'user' | 'assistant' | 'system';
-    content: string;
+    content: string | {
+      type: 'text' | 'image_url';
+      text?: string;
+      image_url?: {
+        url: string;
+      };
+    }[];
   }[];
   temperature?: number;
   max_tokens?: number;
@@ -73,11 +79,49 @@ export const openAIService = {
         temperature: 0.7,
         max_tokens: 1000,
       });
-        console.log('OpenAI Response:', response.data);
+      console.log('OpenAI Response:', response.data);
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.response?.data?.error?.message || 'Falha ao obter resposta do OpenAI');
+      }
+      throw error;
+    }
+  },
+
+  async analyzeImage(imageBase64: string, prompt: string): Promise<ChatCompletionResponse> {
+    try {
+      console.log('OpenAI Vision Request:', { prompt });
+      const response = await openAIClient.post<ChatCompletionResponse>('/chat/completions', {
+        model: 'gpt-4-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful assistant that provides detailed analysis of images. Be specific and descriptive in your analysis.',
+          },
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: prompt,
+              },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: imageBase64,
+                },
+              },
+            ],
+          },
+        ],
+        max_tokens: 1000,
+      });
+      console.log('OpenAI Vision Response:', response.data);
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.response?.data?.error?.message || 'Falha ao analisar imagem com OpenAI');
       }
       throw error;
     }

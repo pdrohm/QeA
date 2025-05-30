@@ -11,6 +11,7 @@ type SpeechStatus = 'idle' | 'listening' | 'processing' | 'error';
 interface ActionButtonsProps {
   handleMicrophonePress: () => void;
   handleClearPress: () => void;
+  handleImageSearch: () => void;
   speechStatus: SpeechStatus;
   isListening: boolean;
   pulseStyle: any;
@@ -22,6 +23,7 @@ interface ActionButtonsProps {
 export const ActionButtons: React.FC<ActionButtonsProps> = ({ 
   handleMicrophonePress,
   handleClearPress,
+  handleImageSearch,
   speechStatus, 
   isListening, 
   pulseStyle, 
@@ -31,6 +33,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
 }) => (
   <Box flexDirection="row" alignItems="center">
     <TouchableOpacity 
+      onPress={handleImageSearch}
       style={{
         padding: theme.spacing.s,
         marginRight: theme.spacing.m,

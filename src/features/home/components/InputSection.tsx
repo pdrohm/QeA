@@ -1,17 +1,55 @@
 import { Box } from '@/src/theme/components';
 import theme from '@/src/theme/theme';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
-import { Text, TextInput } from 'react-native';
+import { Image, Text, TextInput, TouchableOpacity } from 'react-native';
 import { AudioWave } from './AudioWave';
 
 interface InputSectionProps {
   question: string;
   setQuestion: (text: string) => void;
   isListening: boolean;
+  selectedImage?: string;
+  onRemoveImage?: () => void;
 }
 
-export const InputSection: React.FC<InputSectionProps> = ({ question, setQuestion, isListening }) => (
+export const InputSection: React.FC<InputSectionProps> = ({ 
+  question, 
+  setQuestion, 
+  isListening,
+  selectedImage,
+  onRemoveImage
+}) => (
   <Box position="relative">
+    {selectedImage && (
+      <Box 
+        marginBottom="m" 
+        position="relative"
+        width="100%"
+        height={150}
+        borderRadius="m"
+        overflow="hidden"
+      >
+        <Image 
+          source={{ uri: selectedImage }} 
+          style={{ width: '100%', height: '100%' }}
+          resizeMode="cover"
+        />
+        <TouchableOpacity
+          onPress={onRemoveImage}
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            borderRadius: 20,
+            padding: 4,
+          }}
+        >
+          <MaterialCommunityIcons name="close" size={20} color="white" />
+        </TouchableOpacity>
+      </Box>
+    )}
     <TextInput
       value={question}
       onChangeText={setQuestion}

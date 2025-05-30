@@ -22,6 +22,9 @@ export default function HomeScreen() {
     getMicrophoneColor,
     getMicrophoneIcon,
     handleClearPress,
+    handleImageSearch,
+    selectedImage,
+    handleRemoveImage,
   } = useHomeScreen();
 
   return (
@@ -45,6 +48,8 @@ export default function HomeScreen() {
               question={question}
               setQuestion={setQuestion}
               isListening={isListening}
+              selectedImage={selectedImage}
+              onRemoveImage={handleRemoveImage}
             />
 
             <Box 
@@ -59,6 +64,7 @@ export default function HomeScreen() {
               <ActionButtons 
                 handleMicrophonePress={handleMicrophonePress}
                 handleClearPress={handleClearPress}
+                handleImageSearch={handleImageSearch}
                 speechStatus={speechStatus}
                 isListening={isListening}
                 pulseStyle={pulseStyle}
