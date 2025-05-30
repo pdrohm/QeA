@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import { openAIService } from '../../../services/api/openai';
-import { questionsStorage } from '../../../services/storage/questionsStorage';
-import { Question, QuestionStore } from '../../../types';
+import { openAIService } from '../services/api/openai';
+import { questionsStorage } from '../services/storage/questionsStorage';
+import { Question, QuestionStore } from '../types';
 
 export const useQuestionsStore = create<QuestionStore>((set, get) => ({
   questions: [],
