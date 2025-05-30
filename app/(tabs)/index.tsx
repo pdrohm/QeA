@@ -1,9 +1,5 @@
-import { Box, Text } from '../../src/theme/components';
+import HomeScreen from '@/src/screens/HomeScreen';
 
-export default function HomeScreen() {
-  return (
-    <Box flex={1} backgroundColor="mainBackground" padding="m">
-      <Text variant="header">Home</Text>
-    </Box>
-  );
+export default function TabHomeScreen() {
+  return <HomeScreen />;
 } 

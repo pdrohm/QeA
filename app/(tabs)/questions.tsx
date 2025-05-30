@@ -1,9 +1,10 @@
-import { Box, Text } from '../../src/theme/components';
+import { Box, Text } from '@/src/theme/components';
+import React from 'react';
 
-export default function QuestionsScreen() {
+export default function TabQuestionsScreen() {
   return (
-    <Box flex={1} backgroundColor="mainBackground" padding="m">
-      <Text variant="header">Questions</Text>
+    <Box flex={1} padding="m" backgroundColor="mainBackground">
+      <Text variant="header">Perguntas</Text>
     </Box>
   );
 } 

@@ -9,10 +9,12 @@ export interface Question {
 
 export interface QuestionStore {
   questions: Question[];
-  addQuestion: (question: Omit<Question, 'id' | 'createdAt' | 'updatedAt' | 'isFavorite'>) => void;
-  updateQuestion: (id: string, question: Partial<Question>) => void;
-  deleteQuestion: (id: string) => void;
-  toggleFavorite: (id: string) => void;
+  addQuestion: (question: Omit<Question, 'id' | 'createdAt' | 'updatedAt' | 'isFavorite'>) => Promise<Question>;
+  updateQuestion: (id: string, question: Partial<Question>) => Promise<void>;
+  deleteQuestion: (id: string) => Promise<void>;
+  toggleFavorite: (id: string) => Promise<void>;
+  loadQuestions: () => Promise<void>;
+  getAnswer: (id: string) => Promise<void>;
 }
 
 export interface ApiResponse {
