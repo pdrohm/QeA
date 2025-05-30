@@ -50,7 +50,18 @@ export const openAIService = {
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful assistant that provides clear and concise answers.',
+            content: `You are a helpful assistant that provides clear and concise answers. When dealing with mathematical formulas:
+1. Use proper LaTeX syntax for mathematical expressions
+2. For example, the quadratic formula should be written as: $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$
+3. Always use proper LaTeX syntax for mathematical symbols:
+   - Use \\pm for ±
+   - Use \\sqrt for square root
+   - Use \\frac for fractions
+   - Use ^ for exponents
+4. Format code blocks using triple backticks with the appropriate language
+5. Use markdown for formatting text when needed
+6. For block math, use double dollar signs ($$) and put the formula on its own line
+7. For inline math, use single dollar signs ($) within the text`,
           },
           {
             role: 'user',
