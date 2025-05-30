@@ -22,7 +22,7 @@ export default function QuestionDetailsScreen() {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
 
   const handleOpenBottomSheet = useCallback(() => {
-    setIsBottomSheetOpen(prev => !prev);
+    setIsBottomSheetOpen((prev) => !prev);
   }, []);
 
   const handleCloseBottomSheet = useCallback(() => {
@@ -31,13 +31,15 @@ export default function QuestionDetailsScreen() {
 
   const handleShare = useCallback(async () => {
     if (!question) return;
-    
+
     try {
       await Share.share({
-        message: `Pergunta: ${question.text}\n\nResposta: ${question.answer || 'Sem resposta ainda'}`,
+        message: `Pergunta: ${question.text}\n\nResposta: ${
+          question.answer || "Sem resposta ainda"
+        }`,
       });
     } catch (error) {
-      console.error('Error sharing:', error);
+      console.error("Error sharing:", error);
     }
   }, [question]);
 
@@ -71,13 +73,13 @@ export default function QuestionDetailsScreen() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView
         style={{ flex: 1, backgroundColor: theme.colors.mainBackground }}
-        edges={["left", "right"]}
+        edges={["left", "right", "bottom"]}
       >
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={{
             flexGrow: 1,
-            padding: theme.spacing.m,
+            paddingHorizontal: theme.spacing.m,
             justifyContent: "center",
             alignItems: "center",
             gap: theme.spacing.m,
@@ -89,17 +91,16 @@ export default function QuestionDetailsScreen() {
               <MessageBubble content={question.answer} isUser={false} />
             )}
           </Box>
-
-          <ActionButtons
-            isFavorite={question.isFavorite}
-            hasAnswer={!!question.answer}
-            isCopied={isCopied}
-            onToggleFavorite={handleToggleFavorite}
-            onCopyAnswer={handleCopyAnswer}
-            onDelete={handleDelete}
-            onOpenBottomSheet={handleOpenBottomSheet}
-          />
         </ScrollView>
+        <ActionButtons
+          isFavorite={question.isFavorite}
+          hasAnswer={!!question.answer}
+          isCopied={isCopied}
+          onToggleFavorite={handleToggleFavorite}
+          onCopyAnswer={handleCopyAnswer}
+          onDelete={handleDelete}
+          onOpenBottomSheet={handleOpenBottomSheet}
+        />
 
         <QuestionBottomSheet
           isFavorite={question.isFavorite}

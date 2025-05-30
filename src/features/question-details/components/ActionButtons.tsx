@@ -28,7 +28,7 @@ export function ActionButtons({
       width="100%"
       justifyContent="center"
       gap="l"
-      marginTop="l"
+      marginTop="s"
     >
       <TouchableOpacity onPress={onToggleFavorite}>
         <Box
