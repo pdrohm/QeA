@@ -5,6 +5,7 @@ import { Question, QuestionStore } from '../types';
 
 export const useQuestionsStore = create<QuestionStore>((set, get) => ({
   questions: [],
+  favorites: [],
   
   addQuestion: async (questionData) => {
     try {
@@ -100,6 +101,13 @@ export const useQuestionsStore = create<QuestionStore>((set, get) => ({
       console.error('Erro ao carregar perguntas:', error);
       throw error;
     }
+  },
+
+  getFavoriteQuestions: async () => {
+    const questions = await questionsStorage.getQuestions();
+    const favorites = questions.filter((q) => q.isFavorite);
+    set({ favorites });
+    return favorites;
   },
 
   getAnswer: async (id) => {
