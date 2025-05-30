@@ -1,60 +1,19 @@
 import { MessageBubble } from '@/src/components/MessageBubble';
-import { openAIService } from '@/src/services/api/openai';
-import { questionsStorage } from '@/src/services/storage/questionsStorage';
+
 import { Box, Text } from '@/src/theme/components';
 import theme from '@/src/theme/theme';
-import { Question } from '@/src/types';
-import { router } from 'expo-router';
-import React, { useState } from 'react';
+
+import React from 'react';
 import { ActivityIndicator, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useHomeScreen } from './hooks/useHomeScreen';
 
-type Message = {
-  role: 'user' | 'assistant';
-  content: string;
-};
 
 export default function HomeScreen() {
-  const [question, setQuestion] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-
-  const handleSubmit = async () => {
-    if (!question.trim() || isLoading) return;
-
-    setIsLoading(true);
-    const userMessage: Message = { role: 'user', content: question.trim() };
-    setMessages([userMessage]);
-
-    try {
-      const response = await openAIService.askQuestion(question.trim());
-      const answer = response.choices[0].message.content;
-      
-      const assistantMessage: Message = { role: 'assistant', content: answer };
-      setMessages([userMessage, assistantMessage]);
-      
-      const newQuestion: Question = {
-        id: Date.now().toString(),
-        text: question.trim(),
-        answer,
-        isFavorite: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
-      await questionsStorage.saveQuestion(newQuestion);
-      router.push(`/question/${newQuestion.id}`);
-      
-      setQuestion('');
-    } catch (error) {
-      console.error('Error in chat:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+ const { question, isLoading, messages, handleSubmit, setQuestion } = useHomeScreen();
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.mainBackground }} edges={['left', 'bottom']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.mainBackground }} edges={['left']}>
       <Box flex={1} backgroundColor="mainBackground">
         <ScrollView 
           style={{ flex: 1 }}

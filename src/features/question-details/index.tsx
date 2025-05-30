@@ -16,6 +16,8 @@ export default function QuestionDetailsScreen() {
     handleCopyAnswer,
   } = useQuestionDetailsScreen();
 
+  console.log("question", question);
+
   if (isLoading) {
     return (
       <Box
