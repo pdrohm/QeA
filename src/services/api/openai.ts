@@ -50,7 +50,9 @@ export const openAIService = {
         messages: [
           {
             role: 'system',
-            content: `You are a helpful assistant that provides clear and concise answers. When dealing with mathematical formulas:
+            content: `You are a helpful assistant that provides clear and concise answers. 
+            Do not end your response with a question.
+            When dealing with mathematical formulas:
 1. Use proper LaTeX syntax for mathematical expressions
 2. For example, the quadratic formula should be written as: $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$
 3. Always use proper LaTeX syntax for mathematical symbols:

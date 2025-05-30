@@ -136,7 +136,7 @@ meu-guru/
 - **Desafio**: Criar uma experiência de navegação fluida e intuitiva
 - **Solução**: 
   - Uso do Expo Router para navegação declarativa
-  - Implementação de navegação por tabs e drawer
+  - Implementação de navegação por tabs
   - Gestos e transições suaves
 
 ### 4. UI/UX

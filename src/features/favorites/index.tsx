@@ -53,6 +53,13 @@ export default function FavoritesScreen() {
               </Box>
             </TouchableOpacity>
           )}
+          ListEmptyComponent={
+            <Box flex={1} justifyContent="center" alignItems="center">
+              <Text variant="body" color="textSecondary">
+                Nenhuma pergunta favoritada
+              </Text>
+            </Box>
+          }
         />
       </Box>
     </SafeAreaView>

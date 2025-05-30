@@ -39,6 +39,13 @@ export default function HistoryScreen() {
               </Box>
             </TouchableOpacity>
           )}
+          ListEmptyComponent={
+            <Box flex={1} justifyContent="center" alignItems="center">
+              <Text variant="body" color="textSecondary">
+                Nenhuma pergunta encontrada
+              </Text>
+            </Box>
+          }
         />
       </Box>
     </SafeAreaView>
