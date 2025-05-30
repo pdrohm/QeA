@@ -1,25 +1,20 @@
-import { DrawerContent } from "@/src/components/DrawerContent";
-import { Drawer } from "expo-router/drawer";
+import { Stack } from "expo-router";
 import '../src/config/ReactotronConfig';
 import { ThemeProvider } from "../src/theme/ThemeProvider";
 
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <Drawer
-        screenOptions={{
-          headerShown: true,
-        }}
-        drawerContent={(props) => <DrawerContent navigation={props.navigation} />}
-      >
-        <Drawer.Screen 
-          name="index" 
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen 
+          name="question/[id]" 
           options={{ 
-            title: 'Meu Guru',
-            drawerLabel: () => null,
+            title: 'Detalhes da Pergunta',
+            headerBackTitle: 'Voltar',
           }} 
         />
-      </Drawer>
+      </Stack>
     </ThemeProvider>
   );
 }

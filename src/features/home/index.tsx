@@ -1,39 +1,51 @@
+import { MessageBubble } from '@/src/components/MessageBubble';
 import { openAIService } from '@/src/services/api/openai';
+import { questionsStorage } from '@/src/services/storage/questionsStorage';
 import { Box, Text } from '@/src/theme/components';
 import theme from '@/src/theme/theme';
+import { Question } from '@/src/types';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-interface Message {
+type Message = {
   role: 'user' | 'assistant';
   content: string;
-}
+};
 
 export default function HomeScreen() {
   const [question, setQuestion] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const handleSubmit = async () => {
     if (!question.trim() || isLoading) return;
 
-    const userMessage: Message = {
-      role: 'user',
-      content: question.trim(),
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setQuestion('');
     setIsLoading(true);
+    const userMessage: Message = { role: 'user', content: question.trim() };
+    setMessages([userMessage]);
 
     try {
       const response = await openAIService.askQuestion(question.trim());
-      const assistantMessage: Message = {
-        role: 'assistant',
-        content: response.choices[0].message.content,
+      const answer = response.choices[0].message.content;
+      
+      const assistantMessage: Message = { role: 'assistant', content: answer };
+      setMessages([userMessage, assistantMessage]);
+      
+      const newQuestion: Question = {
+        id: Date.now().toString(),
+        text: question.trim(),
+        answer,
+        isFavorite: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
-      setMessages(prev => [...prev, assistantMessage]);
+
+      await questionsStorage.saveQuestion(newQuestion);
+      router.push(`/question/${newQuestion.id}`);
+      
+      setQuestion('');
     } catch (error) {
       console.error('Error in chat:', error);
     } finally {
@@ -49,22 +61,11 @@ export default function HomeScreen() {
           contentContainerStyle={{ padding: theme.spacing.m }}
         >
           {messages.map((message, index) => (
-            <Box
+            <MessageBubble
               key={index}
-              backgroundColor={message.role === 'user' ? 'primary' : 'cardBackground'}
-              padding="m"
-              marginBottom="s"
-              borderRadius="m"
-              alignSelf={message.role === 'user' ? 'flex-end' : 'flex-start'}
-              maxWidth="80%"
-            >
-              <Text
-                variant="body"
-                color={message.role === 'user' ? 'white' : 'textPrimary'}
-              >
-                {message.content}
-              </Text>
-            </Box>
+              content={message.content}
+              isUser={message.role === 'user'}
+            />
           ))}
           {isLoading && (
             <Box alignSelf="flex-start" marginBottom="s">

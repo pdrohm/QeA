@@ -6,6 +6,7 @@ const openAIClient = axios.create({
   headers: {
     'Authorization': `Bearer ${API_CONFIG.OPENAI_API_KEY}`,
     'Content-Type': 'application/json',
+    'Accept': 'application/json, text/plain, */*'
   },
   timeout: 30000,
 });
@@ -62,7 +63,6 @@ export const openAIService = {
         console.log('OpenAI Response:', response.data);
       return response.data;
     } catch (error) {
-      console.error('OpenAI Error:', error);
       if (axios.isAxiosError(error)) {
         throw new Error(error.response?.data?.error?.message || 'Falha ao obter resposta do OpenAI');
       }
