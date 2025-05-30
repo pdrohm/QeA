@@ -1,25 +1,14 @@
-import { questionsStorage } from '@/src/services/storage/questionsStorage';
-import { Question } from '@/src/types';
-import { useEffect, useState } from 'react';
+import { useQuestionsStore } from '@/src/stores/questionsStore';
+import { useEffect } from 'react';
 
 export function useHistoryScreen() {
-    const [questions, setQuestions] = useState<Question[]>([]);
+    const { questions, loadQuestions } = useQuestionsStore();
 
     useEffect(() => {
       loadQuestions();
-    }, []);
-  
-    const loadQuestions = async () => {
-      try {
-        const loadedQuestions = await questionsStorage.getQuestions();
-        setQuestions(loadedQuestions);
-      } catch (error) {
-        console.error('Error loading questions:', error);
-      }
-    };
+    }, [loadQuestions]);
 
     return {
         questions,
     }
-
 }
