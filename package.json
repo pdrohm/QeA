@@ -51,6 +51,9 @@
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
     "husky": "^9.1.7",
+    "reactotron-react-native": "^5.1.13",
+    "reactotron-react-query": "^1.0.4",
+    "reactotron-redux": "^3.2.0",
     "typescript": "~5.8.3"
   },
   "private": true
