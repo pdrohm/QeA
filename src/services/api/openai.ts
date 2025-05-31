@@ -1,3 +1,4 @@
+import { isBase64DataUri } from '@/src/utils/fileutils';
 import axios, { isAxiosError } from 'axios';
 import { CHAT_COMPLETION_CONFIG, IMAGE_ANALYSIS_PROMPT, SYSTEM_PROMPT, VISION_COMPLETION_CONFIG } from '../../constants/openai';
 import { API_CONFIG } from './config';
@@ -84,7 +85,7 @@ export const openAIService = {
 
   async analyzeImage(imageBase64: string, prompt: string): Promise<ChatCompletionResponse> {
     try {
-      if (!imageBase64.startsWith('data:image/')) {
+      if (!isBase64DataUri(imageBase64)) {
         throw new Error('Formato de imagem inválido. Esperado base64 data URL.');
       }
 

@@ -1,15 +1,20 @@
 import * as FileSystem from "expo-file-system";
+import { Platform } from "react-native";
 import { create } from "zustand";
 import { openAIService } from "../services/api/openai";
 import { questionsStorage } from "../services/storage/questionsStorage";
 import { Question, QuestionStore } from "../types";
+import { isBase64DataUri, isFileUri } from "../utils/fileutils";
 
-const isFileUri = (uri: string) => uri.startsWith('file://');
-const isBase64DataUri = (uri: string) => uri.startsWith('data:image/');
+
+const ITEMS_PER_PAGE = Platform.OS === 'android' ? 5 : 8;
 
 export const useQuestionsStore = create<QuestionStore>((set, get) => ({
   questions: [],
   favorites: [],
+  currentPage: 0,
+  hasMore: true,
+  isLoading: false,
 
   addQuestion: async (questionData) => {
     try {
@@ -130,30 +135,35 @@ export const useQuestionsStore = create<QuestionStore>((set, get) => ({
     }
   },
 
-  loadQuestions: async () => {
+  loadQuestions: async (reset = false) => {
     try {
-      const questions = await questionsStorage.getQuestions();
-      
-      const verifiedQuestions = await Promise.all(
-        questions.map(async (question) => {
-          if (question.image) {
-            if (isFileUri(question.image)) {
-              const fileInfo = await FileSystem.getInfoAsync(question.image);
-              if (!fileInfo.exists) {
-                return { ...question, image: undefined };
-              }
-            }
-          }
-          return question;
-        })
-      );
+      set({ isLoading: true });
 
-      set({ questions: verifiedQuestions });
+      const questions = await questionsStorage.getQuestions();
+      const startIndex = reset ? 0 : get().currentPage * ITEMS_PER_PAGE;
+      const endIndex = startIndex + ITEMS_PER_PAGE;
+      const paginatedQuestions = questions.slice(0, endIndex);
+      const hasMore = endIndex < questions.length;
+
+      set((state) => ({
+        questions: reset ? paginatedQuestions : [...state.questions, ...paginatedQuestions.slice(state.questions.length)],
+        currentPage: reset ? 1 : state.currentPage + 1,
+        hasMore,
+        isLoading: false,
+      }));
+
       get().getFavoriteQuestions();
     } catch (error) {
       console.error("Erro ao carregar perguntas:", error);
+      set({ isLoading: false });
       throw error;
     }
+  },
+
+  loadMoreQuestions: async () => {
+    const { hasMore, isLoading } = get();
+    if (!hasMore || isLoading) return;
+    await get().loadQuestions();
   },
 
   getFavoriteQuestions: () => {
@@ -176,7 +186,7 @@ export const useQuestionsStore = create<QuestionStore>((set, get) => ({
           const base64 = await FileSystem.readAsStringAsync(question.image, {
             encoding: FileSystem.EncodingType.Base64,
           });
-          const base64Data = base64.startsWith('data:image/') 
+          const base64Data = isBase64DataUri(base64) 
             ? base64 
             : `data:image/jpeg;base64,${base64}`;
           response = await openAIService.analyzeImage(base64Data, question.text);

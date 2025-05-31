@@ -4,7 +4,14 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
 
 export function useFavoritesScreen() {
-    const { favorites, getFavoriteQuestions, toggleFavorite, deleteQuestion } = useQuestionsStore();
+    const { 
+        favorites, 
+        getFavoriteQuestions, 
+        toggleFavorite, 
+        deleteQuestion,
+        isLoading,
+        loadMoreQuestions
+    } = useQuestionsStore();
 
     useFocusEffect(
         useCallback(() => {
@@ -56,5 +63,7 @@ export function useFavoritesScreen() {
         handleBulkDelete,
         handleBulkFavorite,
         handleToggleFavorite,
+        isLoading,
+        loadMoreQuestions,
     }
 }

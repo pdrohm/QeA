@@ -4,7 +4,7 @@ import { Box, Text } from '@/src/theme/components';
 import theme from '@/src/theme/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { FlatList, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, FlatList, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFavoritesScreen } from './hooks/useFavoritesScreen';
 
@@ -18,8 +18,19 @@ export default function FavoritesScreen() {
     handleBulkDelete,
     handleBulkFavorite,
     toggleSelection,
-    handleToggleFavorite 
+    handleToggleFavorite,
+    isLoading,
+    loadMoreQuestions
   } = useFavoritesScreen();
+
+  const renderFooter = () => {
+    if (!isLoading) return null;
+    return (
+      <Box padding="m" alignItems="center">
+        <ActivityIndicator color={theme.colors.primary} />
+      </Box>
+    );
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.mainBackground }} edges={['left', 'right']}>
@@ -44,33 +55,38 @@ export default function FavoritesScreen() {
           />
         )}
         
-        <FlatList
-          data={favorites}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <QuestionItem
-              item={item}
-              isSelectionMode={isSelectionMode}
-              isSelected={selectedItems.includes(item.id)}
-              onPress={() => {
-                if (isSelectionMode) {
-                  toggleSelection(item.id);
-                } else {
-                  router.push(`/question/${item.id}`);
-                }
-              }}
-              onToggleFavorite={handleToggleFavorite}
-              showFavoriteButton={!isSelectionMode}
-            />
-          )}
-          ListEmptyComponent={
-            <Box flex={1} justifyContent="center" alignItems="center">
-              <Text variant="body" color="textSecondary">
-                Nenhuma pergunta favoritada
-              </Text>
-            </Box>
-          }
-        />
+        {favorites.length === 0 ? (
+          <Box flex={1} justifyContent="center" alignItems="center">
+            <Text variant="body" color="textSecondary">
+              Nenhuma pergunta favoritada
+            </Text>
+          </Box>
+        ) : (
+          <FlatList
+            data={favorites}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <QuestionItem
+                item={item}
+                isSelectionMode={isSelectionMode}
+                isSelected={selectedItems.includes(item.id)}
+                onPress={() => {
+                  if (isSelectionMode) {
+                    toggleSelection(item.id);
+                  } else {
+                    router.push(`/question/${item.id}`);
+                  }
+                }}
+                onToggleFavorite={handleToggleFavorite}
+                showFavoriteButton={!isSelectionMode}
+              />
+            )}
+            contentContainerStyle={{ padding: theme.spacing.m }}
+            onEndReached={loadMoreQuestions}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={renderFooter}
+          />
+        )}
       </Box>
     </SafeAreaView>
   );

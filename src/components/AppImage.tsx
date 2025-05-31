@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, ImageProps } from 'react-native';
 import { Box } from '../theme/components';
 import { Theme } from '../theme/theme';
+import { isFileUri } from '../utils/fileutils';
 
 interface AppImageProps extends Omit<ImageProps, 'source'> {
   uri: string;
@@ -17,7 +18,7 @@ export function AppImage({ uri, fallback, style, ...props }: AppImageProps) {
 
   useEffect(() => {
     const checkImage = async () => {
-      if (uri.startsWith('file://')) {
+      if (isFileUri(uri)) {
         const fileInfo = await FileSystem.getInfoAsync(uri);
         if (!fileInfo.exists) {
           setError(true);

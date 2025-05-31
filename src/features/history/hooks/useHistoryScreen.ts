@@ -4,12 +4,20 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
 
 export function useHistoryScreen() {
-    const { questions, loadQuestions, deleteQuestion, toggleFavorite } = useQuestionsStore();
+    const { 
+        questions, 
+        loadQuestions, 
+        deleteQuestion, 
+        toggleFavorite,
+        isLoading,
+        hasMore,
+        loadMoreQuestions
+    } = useQuestionsStore();
 
     useFocusEffect(
         useCallback(() => {
             const loadData = async () => {
-                await loadQuestions();
+                await loadQuestions(true);
             };
             loadData();
         }, [loadQuestions])
@@ -53,5 +61,8 @@ export function useHistoryScreen() {
         selectAll,
         handleBulkDelete,
         handleBulkFavorite,
+        isLoading,
+        hasMore,
+        loadMoreQuestions,
     }
 }
