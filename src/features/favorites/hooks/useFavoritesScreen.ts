@@ -1,9 +1,10 @@
+import { useSelectionMode } from '@/src/hooks/useSelectionMode';
 import { useQuestionsStore } from '@/src/stores/questionsStore';
 import { useFocusEffect } from '@react-navigation/native';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
 export function useFavoritesScreen() {
-    const { favorites, getFavoriteQuestions, toggleFavorite } = useQuestionsStore();
+    const { favorites, getFavoriteQuestions, toggleFavorite, deleteQuestion } = useQuestionsStore();
 
     useFocusEffect(
         useCallback(() => {
@@ -16,14 +17,44 @@ export function useFavoritesScreen() {
         await toggleFavorite(id);
     }, [toggleFavorite]);
 
-    const sortedFavorites = useMemo(() => {
-        return [...favorites].sort((a, b) => 
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-    }, [favorites]);
+    const {
+        selectedItems,
+        isSelectionMode,
+        toggleSelection,
+        toggleSelectionMode,
+        selectAll,
+        handleBulkAction: handleBulkFavorite,
+    } = useSelectionMode({
+        items: favorites,
+        onBulkAction: async (ids) => {
+            for (const id of ids) {
+                await toggleFavorite(id);
+            }
+        },
+        getId: (item) => item.id,
+    });
+
+    const {
+        handleBulkAction: handleBulkDelete,
+    } = useSelectionMode({
+        items: favorites,
+        onBulkAction: async (ids) => {
+            for (const id of ids) {
+                await deleteQuestion(id);
+            }
+        },
+        getId: (item) => item.id,
+    });
 
     return {
-        favorites: sortedFavorites,
+        favorites,
+        selectedItems,
+        isSelectionMode,
+        toggleSelection,
+        toggleSelectionMode,
+        selectAll,
+        handleBulkDelete,
+        handleBulkFavorite,
         handleToggleFavorite,
     }
 }

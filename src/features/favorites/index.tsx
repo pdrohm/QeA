@@ -1,3 +1,5 @@
+import { QuestionItem } from '@/src/components/QuestionItem';
+import { SelectionHeader } from '@/src/components/SelectionHeader';
 import { Box, Text } from '@/src/theme/components';
 import theme from '@/src/theme/theme';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,51 +9,59 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFavoritesScreen } from './hooks/useFavoritesScreen';
 
 export default function FavoritesScreen() {
-  const { favorites, handleToggleFavorite } = useFavoritesScreen();
+  const { 
+    favorites, 
+    selectedItems,
+    isSelectionMode,
+    toggleSelectionMode,
+    selectAll,
+    handleBulkDelete,
+    handleBulkFavorite,
+    toggleSelection,
+    handleToggleFavorite 
+  } = useFavoritesScreen();
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.mainBackground }} edges={['left', 'right']}>
       <Box flex={1} padding="m">
-        <Text variant="header" marginBottom="l">
-          Favoritos
-        </Text>
+        <Box flexDirection="row" justifyContent="space-between" alignItems="center" marginBottom="l">
+          <Text variant="header">Favoritos</Text>
+          <TouchableOpacity onPress={toggleSelectionMode}>
+            <Ionicons 
+              name={isSelectionMode ? "close" : "checkbox-outline"} 
+              size={24} 
+              color={theme.colors.textPrimary} 
+            />
+          </TouchableOpacity>
+        </Box>
+
+        {isSelectionMode && (
+          <SelectionHeader
+            onSelectAll={selectAll}
+            onBulkFavorite={handleBulkFavorite}
+            onBulkDelete={handleBulkDelete}
+            selectedCount={selectedItems.length}
+          />
+        )}
         
         <FlatList
           data={favorites}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => router.push(`/question/${item.id}`)}
-            >
-              <Box
-                backgroundColor="cardBackground"
-                padding="m"
-                marginBottom="s"
-                borderRadius="m"
-                flexDirection="row"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Box flex={1}>
-                  <Text variant="body" color="textPrimary" marginBottom="xs">
-                    {item.text}
-                  </Text>
-                  <Text variant="caption" color="textSecondary">
-                    {new Date(item.createdAt).toLocaleDateString()}
-                  </Text>
-                </Box>
-                <TouchableOpacity
-                  onPress={(e) => handleToggleFavorite(item.id, e)}
-                  style={{ marginLeft: theme.spacing.m }}
-                >
-                  <Ionicons
-                    name="star"
-                    size={24}
-                    color={theme.colors.primary}
-                  />
-                </TouchableOpacity>
-              </Box>
-            </TouchableOpacity>
+            <QuestionItem
+              item={item}
+              isSelectionMode={isSelectionMode}
+              isSelected={selectedItems.includes(item.id)}
+              onPress={() => {
+                if (isSelectionMode) {
+                  toggleSelection(item.id);
+                } else {
+                  router.push(`/question/${item.id}`);
+                }
+              }}
+              onToggleFavorite={handleToggleFavorite}
+              showFavoriteButton={!isSelectionMode}
+            />
           )}
           ListEmptyComponent={
             <Box flex={1} justifyContent="center" alignItems="center">
