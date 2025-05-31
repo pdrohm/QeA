@@ -11,7 +11,11 @@ class AsyncStorageService implements StorageService {
   async getItem<T>(key: string): Promise<T | null> {
     try {
       const value = await AsyncStorage.getItem(key);
-      return value ? JSON.parse(value) : null;
+      if (value) {
+        const parsedValue = JSON.parse(value);
+        return parsedValue;
+      }
+      return null;
     } catch (error) {
       console.error(`Erro ao buscar item ${key}:`, error);
       throw new Error(`Falha ao buscar item ${key}`);
@@ -20,7 +24,8 @@ class AsyncStorageService implements StorageService {
 
   async setItem<T>(key: string, value: T): Promise<void> {
     try {
-      await AsyncStorage.setItem(key, JSON.stringify(value));
+      const stringifiedValue = JSON.stringify(value);
+      await AsyncStorage.setItem(key, stringifiedValue);
     } catch (error) {
       console.error(`Erro ao salvar item ${key}:`, error);
       throw new Error(`Falha ao salvar item ${key}`);

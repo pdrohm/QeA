@@ -71,6 +71,7 @@ export default function HomeScreen() {
                 opacityStyle={opacityStyle}
                 getMicrophoneIcon={getMicrophoneIcon}
                 getMicrophoneColor={getMicrophoneColor}
+                isLoading={isLoading}
               />
 
               <SendButton 

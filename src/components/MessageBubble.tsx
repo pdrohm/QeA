@@ -1,13 +1,19 @@
 import { Box } from '@/src/theme/components';
 import theme from '@/src/theme/theme';
 import React from 'react';
+import { Dimensions, Text } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import MathView from 'react-native-math-view';
+import { AppImage } from './AppImage';
 
 type MessageBubbleProps = {
   content: string;
   isUser: boolean;
+  image?: string;
 };
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const IMAGE_CONTAINER_WIDTH = SCREEN_WIDTH * 0.6;
 
 const MathWrapper = ({ expression, isUser }: { expression: string; isUser: boolean }) => (
   <Box marginVertical="xs">
@@ -19,7 +25,7 @@ const MathWrapper = ({ expression, isUser }: { expression: string; isUser: boole
   </Box>
 );
 
-export function MessageBubble({ content, isUser }: MessageBubbleProps) {
+export function MessageBubble({ content, isUser, image }: MessageBubbleProps) {
   const markdownStyles = {
     body: {
       color: isUser ? theme.colors.white : theme.colors.textPrimary,
@@ -53,6 +59,34 @@ export function MessageBubble({ content, isUser }: MessageBubbleProps) {
       alignSelf={isUser ? 'flex-end' : 'flex-start'}
       maxWidth="80%"
     >
+      {image && (
+        <Box
+          width={IMAGE_CONTAINER_WIDTH}
+          height={IMAGE_CONTAINER_WIDTH * 0.75}
+          marginBottom="s"
+          borderRadius="m"
+          overflow="hidden"
+          backgroundColor="cardBackground"
+        >
+          <AppImage
+            uri={image}
+            style={{ width: '100%', height: '100%' }}
+            resizeMode="contain"
+            fallback={
+              <Box
+                flex={1}
+                justifyContent="center"
+                alignItems="center"
+                backgroundColor="cardBackground"
+              >
+                <Text style={{ color: isUser ? theme.colors.white : theme.colors.textPrimary }}>
+                  Image not available
+                </Text>
+              </Box>
+            }
+          />
+        </Box>
+      )}
       {parts.map((part, idx) => {
         if (part.startsWith('$$') && part.endsWith('$$')) {
           // Matematica em bloco

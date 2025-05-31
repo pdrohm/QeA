@@ -1,10 +1,10 @@
+import { useImageHandler } from '@/src/hooks/useImageHandler';
 import { useSpeechRecognition } from "@/src/hooks/useSpeechRecognition";
 import { openAIService } from "@/src/services/api/openai";
 import { questionsStorage } from "@/src/services/storage/questionsStorage";
 import theme from "@/src/theme/theme";
-import { Question } from "@/src/types";
+import { Question } from '@/src/types/question';
 import * as FileSystem from "expo-file-system";
-import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
@@ -16,11 +16,6 @@ import {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
-
-interface Message {
-  role: "user" | "assistant";
-  content: string;
-}
 
 type SpeechStatus = "idle" | "listening" | "processing" | "error";
 
@@ -40,7 +35,6 @@ const ANIMATION_CONFIG = {
 export function useHomeScreen() {
   const [question, setQuestion] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
   const [speechStatus, setSpeechStatus] = useState<SpeechStatus>("idle");
   const [selectedImage, setSelectedImage] = useState<string | undefined>();
 
@@ -54,6 +48,8 @@ export function useHomeScreen() {
 
   const pulseAnim = useSharedValue(1);
   const opacityAnim = useSharedValue(1);
+
+  const { pickImage, saveImage } = useImageHandler();
 
   useEffect(() => {
     if (transcript && !isListening) {
@@ -123,6 +119,10 @@ export function useHomeScreen() {
   };
 
   const getMicrophoneColor = () => {
+    if (isLoading) {
+      return theme.colors.gray;
+    }
+
     switch (speechStatus) {
       case "listening":
       case "error":
@@ -140,36 +140,18 @@ export function useHomeScreen() {
 
   const handleImageSearch = async () => {
     try {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const imageInfo = await pickImage();
+      if (!imageInfo) return;
 
-      if (status !== "granted") {
-        Alert.alert(
-          "Permissão necessária",
-          "Precisamos de permissão para acessar sua galeria de imagens."
-        );
-        return;
+      const savedImagePath = await saveImage(imageInfo);
+      if (!savedImagePath) {
+        throw new Error('Falha ao salvar imagem');
       }
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.1,
-        base64: true,
-      });
-
-      if (!result.canceled) {
-        const selectedImage = result.assets[0];
-        setSelectedImage(selectedImage.uri);
-        setQuestion("Analise esta imagem e me diga o que você vê.");
-      }
+      setSelectedImage(savedImagePath);
     } catch (error) {
-      console.error("Error picking image:", error);
-      Alert.alert(
-        "Erro",
-        "Não foi possível selecionar a imagem. Por favor, tente novamente."
-      );
+      console.error('Erro ao processar imagem:', error);
+      Alert.alert('Erro', 'Falha ao processar imagem. Por favor, tente novamente.');
     }
   };
 
@@ -197,100 +179,71 @@ export function useHomeScreen() {
     }
   };
 
-  const processImage = async (imageUri: string): Promise<string> => {
-    if (imageUri.startsWith("data:image")) {
-      return imageUri;
-    }
 
-    const base64 = await FileSystem.readAsStringAsync(imageUri, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
-    return `data:image/jpeg;base64,${base64}`;
+  const saveQuestionToStorage = async (question: Question) => {
+    await questionsStorage.saveQuestion(question);
+    router.push(`/question/${question.id}`);
   };
 
-  const saveQuestionToStorage = async (
-    userMessage: Message,
-    answer: string
-  ) => {
-    const newQuestion: Question = {
-      id: Date.now().toString(),
-      text: userMessage.content,
-      answer,
-      isFavorite: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    await questionsStorage.saveQuestion(newQuestion);
-    router.push(`/question/${newQuestion.id}`);
-  };
-
-  const createMessages = (
-    question: string,
-    answer: string,
-    hasImage: boolean
-  ): Message[] => {
-    const userMessage: Message = {
-      role: "user",
-      content: hasImage
-        ? `[Imagem]\n${
-            question.trim() || "Analise esta imagem e me diga o que você vê."
-          }`
-        : question.trim(),
-    };
-    const assistantMessage: Message = { role: "assistant", content: answer };
-    return [userMessage, assistantMessage];
-  };
-
-  const getQuestionResponse = async (
-    question: string,
-    imageBase64?: string
-  ) => {
-    if (imageBase64) {
-      return await openAIService.analyzeImage(
-        imageBase64,
-        question.trim() || "Analise esta imagem e me diga o que você vê."
-      );
-    }
-    return await openAIService.askQuestion(question.trim());
-  };
-
-  const handleSubmit = async () => {
-    if ((!question.trim() && !selectedImage) || isLoading) return;
-
-    setIsLoading(true);
-    let imageBase64 = "";
-
+  const getQuestionResponse = async (question: Question) => {
     try {
-      if (selectedImage) {
-        try {
-          imageBase64 = await processImage(selectedImage);
-        } catch (error) {
-          console.error("Error processing image:", error);
-          Alert.alert(
-            "Erro",
-            "Não foi possível processar a imagem. Por favor, tente novamente."
-          );
-          return;
+      if (question.image) {
+        const base64 = await FileSystem.readAsStringAsync(question.image, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        const base64Data = `data:image/jpeg;base64,${base64}`;
+        const response = await openAIService.analyzeImage(
+          base64Data,
+          question.text
+        );
+        
+        if (!response || !response.choices || !response.choices[0]?.message?.content) {
+          throw new Error('Resposta inválida do OpenAI');
         }
+        
+        return response;
+      }
+      return await openAIService.askQuestion(question.text);
+    } catch (error) {
+      console.error('Erro ao obter resposta da pergunta:', error);
+      throw error;
+    }
+  };
+
+  const handleSendMessage = async () => {
+    try {
+      if (!question.trim() && !selectedImage) return;
+
+      setIsLoading(true);
+
+      const newQuestion: Question = {
+        id: Date.now().toString(),
+        text: question.trim() || "Analise esta imagem e me diga o que você vê.",
+        image: selectedImage,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        isFavorite: false,
+        status: 'pending',
+      };
+
+      const response = await getQuestionResponse(newQuestion);
+      if (!response || !response.choices || !response.choices[0]?.message?.content) {
+        throw new Error('Falha ao obter resposta do OpenAI');
       }
 
-      const response = await getQuestionResponse(question, imageBase64);
-      const answer = response.choices[0].message.content;
+      const updatedQuestion: Question = {
+        ...newQuestion,
+        answer: response.choices[0].message.content,
+        status: 'completed',
+      };
 
-      const messages = createMessages(question, answer, !!selectedImage);
-      setMessages(messages);
-
-      await saveQuestionToStorage(messages[0], answer);
-
-      setQuestion("");
+      await saveQuestionToStorage(updatedQuestion);
+      setQuestion('');
       setSelectedImage(undefined);
+
     } catch (error) {
-      console.error("Error in chat:", error);
-      Alert.alert(
-        "Erro",
-        "Não foi possível processar sua pergunta. Por favor, tente novamente."
-      );
+      console.error('Erro ao enviar mensagem:', error);
+      Alert.alert('Erro', 'Falha ao enviar mensagem. Por favor, tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -299,11 +252,10 @@ export function useHomeScreen() {
   return {
     question,
     isLoading,
-    messages,
     isListening,
     speechStatus,
     selectedImage,
-    handleSubmit,
+    handleSubmit: handleSendMessage,
     setQuestion,
     handleMicrophonePress,
     handleClearPress: () => setQuestion(""),

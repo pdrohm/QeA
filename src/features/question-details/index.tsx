@@ -1,5 +1,4 @@
-import { useCallback, useState } from "react";
-import { ActivityIndicator, ScrollView, Share } from "react-native";
+import { ActivityIndicator, ScrollView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MessageBubble } from "../../components/MessageBubble";
@@ -14,34 +13,15 @@ export default function QuestionDetailsScreen() {
     question,
     isLoading,
     isCopied,
+    isBottomSheetOpen,
+    formattedImage,
     handleToggleFavorite,
     handleDelete,
     handleCopyAnswer,
+    handleOpenBottomSheet,
+    handleCloseBottomSheet,
+    handleShare,
   } = useQuestionDetailsScreen();
-
-  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
-
-  const handleOpenBottomSheet = useCallback(() => {
-    setIsBottomSheetOpen((prev) => !prev);
-  }, []);
-
-  const handleCloseBottomSheet = useCallback(() => {
-    setIsBottomSheetOpen(false);
-  }, []);
-
-  const handleShare = useCallback(async () => {
-    if (!question) return;
-
-    try {
-      await Share.share({
-        message: `Pergunta: ${question.text}\n\nResposta: ${
-          question.answer || "Sem resposta ainda"
-        }`,
-      });
-    } catch (error) {
-      console.error("Error sharing:", error);
-    }
-  }, [question]);
 
   if (isLoading) {
     return (
@@ -86,9 +66,16 @@ export default function QuestionDetailsScreen() {
           }}
         >
           <Box width="100%" alignItems="center" gap="m">
-            <MessageBubble content={question.text} isUser={true} />
+            <MessageBubble 
+              content={question.text} 
+              isUser={true} 
+              image={formattedImage}
+            />
             {question.answer && (
-              <MessageBubble content={question.answer} isUser={false} />
+              <MessageBubble 
+                content={question.answer} 
+                isUser={false} 
+              />
             )}
           </Box>
         </ScrollView>

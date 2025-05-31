@@ -1,4 +1,5 @@
-import axios from 'axios';
+import axios, { isAxiosError } from 'axios';
+import { CHAT_COMPLETION_CONFIG, IMAGE_ANALYSIS_PROMPT, SYSTEM_PROMPT, VISION_COMPLETION_CONFIG } from '../../constants/openai';
 import { API_CONFIG } from './config';
 
 const openAIClient = axios.create({
@@ -52,59 +53,60 @@ export const openAIService = {
     try {
       console.log('OpenAI Request:', { question });
       const response = await openAIClient.post<ChatCompletionResponse>('/chat/completions', {
-        model: 'gpt-3.5-turbo',
+        ...CHAT_COMPLETION_CONFIG,
         messages: [
           {
             role: 'system',
-            content: `You are a helpful assistant that provides clear and concise answers. 
-            Do not end your response with a question.
-            When dealing with mathematical formulas:
-1. Use proper LaTeX syntax for mathematical expressions
-2. For example, the quadratic formula should be written as: $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$
-3. Always use proper LaTeX syntax for mathematical symbols:
-   - Use \\pm for ±
-   - Use \\sqrt for square root
-   - Use \\frac for fractions
-   - Use ^ for exponents
-4. Format code blocks using triple backticks with the appropriate language
-5. Use markdown for formatting text when needed
-6. For block math, use double dollar signs ($$) and put the formula on its own line
-7. For inline math, use single dollar signs ($) within the text`,
+            content: SYSTEM_PROMPT,
           },
           {
             role: 'user',
             content: question,
           },
         ],
-        temperature: 0.7,
-        max_tokens: 1000,
       });
-      console.log('OpenAI Response:', response.data);
+      console.log('OpenAI resposta:', response.data);
       return response.data;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new Error(error.response?.data?.error?.message || 'Falha ao obter resposta do OpenAI');
+      if (isAxiosError(error)) {
+        const errorMessage = error.response?.data?.error?.message || 'Falha ao obter resposta do OpenAI';
+        console.error('OpenAI API Error:', {
+          status: error.response?.status,
+          message: errorMessage,
+          details: error.response?.data
+        });
+        throw new Error(errorMessage);
       }
+      console.error('Unexpected error:', error);
       throw error;
     }
   },
 
   async analyzeImage(imageBase64: string, prompt: string): Promise<ChatCompletionResponse> {
     try {
-      console.log('OpenAI Vision Request:', { prompt });
+      if (!imageBase64.startsWith('data:image/')) {
+        throw new Error('Formato de imagem inválido. Esperado base64 data URL.');
+      }
+
+      console.log('OpenAI Image Request:', { 
+        prompt,
+        imageSize: imageBase64.length,
+        imageType: imageBase64.split(';')[0].split(':')[1]
+      });
+
       const response = await openAIClient.post<ChatCompletionResponse>('/chat/completions', {
-        model: 'gpt-4-turbo',
+        ...VISION_COMPLETION_CONFIG,
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful assistant that provides detailed analysis of images. Be specific and descriptive in your analysis.',
+            content: IMAGE_ANALYSIS_PROMPT,
           },
           {
             role: 'user',
             content: [
               {
                 type: 'text',
-                text: prompt,
+                text: prompt || 'Analise esta imagem e me diga o que você vê.',
               },
               {
                 type: 'image_url',
@@ -115,14 +117,26 @@ export const openAIService = {
             ],
           },
         ],
-        max_tokens: 1000,
       });
-      console.log('OpenAI Vision Response:', response.data);
+
+      console.log('OpenAI Imagem Analizada:', {
+        model: response.data.model,
+        usage: response.data.usage,
+        finishReason: response.data.choices[0].finish_reason
+      });
+
       return response.data;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new Error(error.response?.data?.error?.message || 'Falha ao analisar imagem com OpenAI');
+      if (isAxiosError(error)) {
+        const errorMessage = error.response?.data?.error?.message || 'Falha ao analisar imagem com OpenAI';
+        console.error('OpenAI Vision API Error:', {
+          status: error.response?.status,
+          message: errorMessage,
+          details: error.response?.data
+        });
+        throw new Error(errorMessage);
       }
+      console.error('Unexpected error in image analysis:', error);
       throw error;
     }
   },

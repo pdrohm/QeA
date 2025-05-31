@@ -25,7 +25,7 @@ export const questionsStorage = {
   async saveQuestion(question: Question): Promise<void> {
     try {
       const questions = await this.getQuestions();
-      questions.push(question);
+      questions.unshift(question);
       await this.saveQuestions(questions);
     } catch (error) {
       console.error('Erro ao salvar pergunta:', error);

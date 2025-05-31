@@ -18,6 +18,7 @@ interface ActionButtonsProps {
   opacityStyle: any;
   getMicrophoneIcon: () => IconName;
   getMicrophoneColor: () => string;
+  isLoading: boolean;
 }
 
 export const ActionButtons: React.FC<ActionButtonsProps> = ({ 
@@ -29,16 +30,19 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   pulseStyle, 
   opacityStyle, 
   getMicrophoneIcon, 
-  getMicrophoneColor 
+  getMicrophoneColor,
+  isLoading
 }) => (
   <Box flexDirection="row" alignItems="center">
     <TouchableOpacity 
       onPress={handleImageSearch}
+      disabled={isLoading}
       style={{
         padding: theme.spacing.s,
         marginRight: theme.spacing.m,
         backgroundColor: theme.colors.mainBackground,
         borderRadius: theme.borderRadii.m,
+        opacity: isLoading ? 0.5 : 1,
       }}
     >
       <MaterialCommunityIcons name="image-search" size={24} color={theme.colors.primary} />
@@ -51,12 +55,13 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         {
           backgroundColor: isListening ? theme.colors.error + '20' : 'transparent',
           borderRadius: theme.borderRadii.m,
+          opacity: isLoading ? 0.5 : 1,
         }
       ]}
     >
       <TouchableOpacity 
         onPress={handleMicrophonePress}
-        disabled={speechStatus === 'processing'}
+        disabled={speechStatus === 'processing' || isLoading}
         style={{
           padding: theme.spacing.s,
           backgroundColor: theme.colors.mainBackground,
@@ -81,11 +86,13 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
 
     <TouchableOpacity 
       onPress={handleClearPress}
+      disabled={isLoading}
       style={{
         padding: theme.spacing.s,
         marginLeft: theme.spacing.xl,
         backgroundColor: theme.colors.mainBackground,
         borderRadius: theme.borderRadii.m,
+        opacity: isLoading ? 0.5 : 1,
       }}
     >
       <MaterialCommunityIcons name="broom" size={24} color={theme.colors.error} />

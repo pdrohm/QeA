@@ -26,6 +26,7 @@
     "expo-clipboard": "~7.1.4",
     "expo-constants": "~17.1.6",
     "expo-dev-client": "~5.1.8",
+    "expo-file-system": "~18.1.10",
     "expo-font": "~13.3.1",
     "expo-haptics": "~14.1.4",
     "expo-image": "~2.1.7",
@@ -50,9 +51,7 @@
     "react-native-screens": "~4.10.0",
     "react-native-svg": "15.11.2",
     "react-native-web": "~0.20.0",
-    "zustand": "^5.0.5",
-    "expo-file-system": "~18.1.10",
-    "expo-image-manipulator": "~13.1.7"
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
