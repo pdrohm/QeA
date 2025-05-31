@@ -1,8 +1,8 @@
-# Meu Guru
+# Q&A
 
 ## 📱 Sobre o Projeto
 
-Meu Guru é um aplicativo móvel desenvolvido com React Native e Expo, focado em fornecer uma experiência educacional interativa e personalizada.
+Q&A é um aplicativo móvel desenvolvido com React Native e Expo, focado em fornecer uma experiência educacional interativa e personalizada.
 
 ## 🏗️ Arquitetura do Projeto
 
