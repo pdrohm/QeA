@@ -29,28 +29,28 @@ export function useHistoryScreen() {
         toggleSelection,
         toggleSelectionMode,
         selectAll,
-        handleBulkAction: handleBulkFavorite,
+        handleBulkAction,
     } = useSelectionMode({
         items: questions,
-        onBulkAction: async (ids) => {
-            for (const id of ids) {
-                await toggleFavorite(id);
-            }
+        onBulkAction: async () => {
+            return;
         },
         getId: (item) => item.id,
     });
 
-    const {
-        handleBulkAction: handleBulkDelete,
-    } = useSelectionMode({
-        items: questions,
-        onBulkAction: async (ids) => {
-            for (const id of ids) {
-                await deleteQuestion(id);
-            }
-        },
-        getId: (item) => item.id,
-    });
+    const handleBulkFavorite = async () => {
+        for (const id of selectedItems) {
+            await toggleFavorite(id);
+        }
+        handleBulkAction();
+    };
+
+    const handleBulkDelete = async () => {
+        for (const id of selectedItems) {
+            await deleteQuestion(id);
+        }
+        handleBulkAction();
+    };
 
     return {
         questions,
