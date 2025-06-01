@@ -1,14 +1,19 @@
-import { isBase64DataUri } from '@/src/utils/fileutils';
-import axios, { isAxiosError } from 'axios';
-import { CHAT_COMPLETION_CONFIG, IMAGE_ANALYSIS_PROMPT, SYSTEM_PROMPT, VISION_COMPLETION_CONFIG } from '../../constants/openai';
-import { API_CONFIG } from './config';
+import { isBase64DataUri } from "@/src/utils/fileutils";
+import axios, { isAxiosError } from "axios";
+import {
+  CHAT_COMPLETION_CONFIG,
+  IMAGE_ANALYSIS_PROMPT,
+  SYSTEM_PROMPT,
+  VISION_COMPLETION_CONFIG,
+} from "../../constants/openai";
+import { API_CONFIG } from "./config";
 
 const openAIClient = axios.create({
   baseURL: API_CONFIG.OPENAI_API_URL,
   headers: {
-    'Authorization': `Bearer ${API_CONFIG.OPENAI_API_KEY}`,
-    'Content-Type': 'application/json',
-    'Accept': 'application/json, text/plain, */*'
+    Authorization: `Bearer ${API_CONFIG.OPENAI_API_KEY}`,
+    "Content-Type": "application/json",
+    Accept: "application/json, text/plain, */*",
   },
   timeout: 30000,
 });
@@ -16,14 +21,16 @@ const openAIClient = axios.create({
 export interface ChatCompletionRequest {
   model: string;
   messages: {
-    role: 'user' | 'assistant' | 'system';
-    content: string | {
-      type: 'text' | 'image_url';
-      text?: string;
-      image_url?: {
-        url: string;
-      };
-    }[];
+    role: "user" | "assistant" | "system";
+    content:
+      | string
+      | {
+          type: "text" | "image_url";
+          text?: string;
+          image_url?: {
+            url: string;
+          };
+        }[];
   }[];
   temperature?: number;
   max_tokens?: number;
@@ -52,93 +59,95 @@ export interface ChatCompletionResponse {
 export const openAIService = {
   async askQuestion(question: string): Promise<ChatCompletionResponse> {
     try {
-      console.log('OpenAI Request:', { question });
-      const response = await openAIClient.post<ChatCompletionResponse>('/chat/completions', {
-        ...CHAT_COMPLETION_CONFIG,
-        messages: [
-          {
-            role: 'system',
-            content: SYSTEM_PROMPT,
-          },
-          {
-            role: 'user',
-            content: question,
-          },
-        ],
-      });
-      console.log('OpenAI resposta:', response.data);
+      const response = await openAIClient.post<ChatCompletionResponse>(
+        "/chat/completions",
+        {
+          ...CHAT_COMPLETION_CONFIG,
+          messages: [
+            {
+              role: "system",
+              content: SYSTEM_PROMPT,
+            },
+            {
+              role: "user",
+              content: question,
+            },
+          ],
+        }
+      );
       return response.data;
     } catch (error) {
       if (isAxiosError(error)) {
-        const errorMessage = error.response?.data?.error?.message || 'Falha ao obter resposta do OpenAI';
-        console.error('OpenAI API Error:', {
+        const errorMessage =
+          error.response?.data?.error?.message ||
+          "Falha ao obter resposta do OpenAI";
+        console.error("OpenAI API Error:", {
           status: error.response?.status,
           message: errorMessage,
-          details: error.response?.data
+          details: error.response?.data,
         });
         throw new Error(errorMessage);
       }
-      console.error('Unexpected error:', error);
+      console.error("Unexpected error:", error);
       throw error;
     }
   },
 
-  async analyzeImage(imageBase64: string, prompt: string): Promise<ChatCompletionResponse> {
+  async analyzeImage(
+    imageBase64: string,
+    prompt: string
+  ): Promise<ChatCompletionResponse> {
     try {
       if (!isBase64DataUri(imageBase64)) {
-        throw new Error('Formato de imagem inválido. Esperado base64 data URL.');
+        throw new Error(
+          "Formato de imagem inválido. Esperado base64 data URL."
+        );
       }
 
-      console.log('OpenAI Image Request:', { 
-        prompt,
-        imageSize: imageBase64.length,
-        imageType: imageBase64.split(';')[0].split(':')[1]
-      });
-
-      const response = await openAIClient.post<ChatCompletionResponse>('/chat/completions', {
-        ...VISION_COMPLETION_CONFIG,
-        messages: [
-          {
-            role: 'system',
-            content: IMAGE_ANALYSIS_PROMPT,
-          },
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: prompt || 'Analise esta imagem e me diga o que você vê.',
-              },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: imageBase64,
+      const response = await openAIClient.post<ChatCompletionResponse>(
+        "/chat/completions",
+        {
+          ...VISION_COMPLETION_CONFIG,
+          messages: [
+            {
+              role: "system",
+              content: IMAGE_ANALYSIS_PROMPT,
+            },
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text:
+                    prompt || "Analise esta imagem e me diga o que você vê.",
                 },
-              },
-            ],
-          },
-        ],
-      });
-
-      console.log('OpenAI Imagem Analizada:', {
-        model: response.data.model,
-        usage: response.data.usage,
-        finishReason: response.data.choices[0].finish_reason
-      });
+                {
+                  type: "image_url",
+                  image_url: {
+                    url: imageBase64,
+                  },
+                },
+              ],
+            },
+          ],
+        }
+      );
 
       return response.data;
     } catch (error) {
       if (isAxiosError(error)) {
-        const errorMessage = error.response?.data?.error?.message || 'Falha ao analisar imagem com OpenAI';
-        console.error('OpenAI Vision API Error:', {
+        const errorMessage =
+          error.response?.data?.error?.message ||
+          "Falha ao analisar imagem com OpenAI";
+        console.error("OpenAI Vision API Error:", {
           status: error.response?.status,
           message: errorMessage,
-          details: error.response?.data
+          details: error.response?.data,
         });
         throw new Error(errorMessage);
       }
-      console.error('Unexpected error in image analysis:', error);
+      console.error("Unexpected error in image analysis:", error);
       throw error;
     }
   },
-}; 
+};
