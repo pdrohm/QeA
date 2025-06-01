@@ -56,6 +56,10 @@ meu-guru/
 │   │       ├── components/    # Componentes de detalhes
 │   │       ├── hooks/        # Hooks para lógica de detalhes
 │   │       └── index.tsx     # Componente principal
+│   ├── hooks/ 
+│   │   └── useImageHandler.tsx # Hook global, utilizado para tratamento de imagens 
+│   │   └── useSelectionMode.tsx # Hook global, utilizado para função "selecionar todos" de uma lista
+│   │   └── useSpeechRecognition.tsx # Hook global, utilizado para captura e detecção de voz
 │   ├── services/         # Serviços e APIs
 │   │   ├── api/         # Configuração e integração com APIs
 │   │   └── storage/     # Gerenciamento de armazenamento local

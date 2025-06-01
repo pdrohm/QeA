@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "meu-guru",
-    "slug": "meu-guru",
+    "name": "q&a",
+    "slug": "q&a",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "meuguru",
+    "scheme": "qa",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -14,7 +14,7 @@
         "NSMicrophoneUsageDescription": "Permita que o $(PRODUCT_NAME) acesse seu microfone para entrada de voz",
         "NSSpeechRecognitionUsageDescription": "Permita que o $(PRODUCT_NAME) use reconhecimento de fala para entrada de voz"
       },
-      "bundleIdentifier": "com.pdrohm.meuguru"
+      "bundleIdentifier": "com.pdrohm.qa"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,7 +26,7 @@
         "RECORD_AUDIO",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.pdrohm.meuguru"
+      "package": "com.pdrohm.qa"
     },
     "web": {
       "bundler": "metro",
@@ -41,7 +41,7 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#6042FF"
         }
       ],
       "expo-speech-recognition",

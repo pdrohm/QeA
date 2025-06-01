@@ -28,7 +28,7 @@ export default function TabsLayout() {
       <Tabs.Screen 
         name="history" 
         options={{ 
-          title: 'Histórico',
+          title: '',
           tabBarLabel: 'Histórico',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="time-outline" size={size} color={color} />
@@ -38,7 +38,7 @@ export default function TabsLayout() {
       <Tabs.Screen 
         name="favorites" 
         options={{ 
-          title: 'Favoritos',
+          title: '',
           tabBarLabel: 'Favoritos',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="star-outline" size={size} color={color} />

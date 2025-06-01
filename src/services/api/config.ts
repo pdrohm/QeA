@@ -4,6 +4,6 @@ export const API_CONFIG = {
 };
 
 export const STORAGE_KEYS = {
-  QUESTIONS: '@meu-guru:questions',
-  FAVORITES: '@meu-guru:favorites',
-};
+  QUESTIONS: '@q&a:questions',
+  FAVORITES: '@q&a:favorites',
+} as const;
