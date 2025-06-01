@@ -4,6 +4,12 @@
 
 Q&A é um aplicativo móvel desenvolvido com React Native e Expo, focado em fornecer uma experiência educacional interativa e personalizada.
 
+## 🎥 Demonstração
+
+[![Q&A App Demo](https://img.youtube.com/vi/XrolptAWxH0/maxresdefault.jpg)](https://www.youtube.com/shorts/XrolptAWxH0)
+
+*Clique na imagem acima para ver a demonstração do aplicativo*
+
 ## 🏗️ Arquitetura do Projeto
 
 ### Arquitetura Baseada em Features
@@ -30,7 +36,7 @@ feature/
 ### Estrutura de Diretórios
 
 ```
-meu-guru/
+QeA/
 ├── app/                    # Rotas e navegação (Expo Router)
 │   ├── (tabs)/            # Navegação por tabs
 │   └── question/          # Rotas relacionadas a questões
