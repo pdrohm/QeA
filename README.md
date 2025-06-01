@@ -167,6 +167,59 @@ meu-guru/
 - `npm run lint`: Executa o linter
 - `npm run reset-project`: Reseta o projeto
 
+## 📱 Executando o App
+
+### Desenvolvimento com Expo Go (Mais Simples)
+1. Instale o app Expo Go no seu dispositivo:
+   - [iOS App Store](https://apps.apple.com/app/expo-go/id982107779)
+   - [Android Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
+2. Execute `npm start` no terminal
+3. Escaneie o QR code com:
+   - iOS: Câmera do iPhone
+   - Android: App Expo Go
+
+### Desenvolvimento com Build Nativo
+
+#### iOS
+1. Certifique-se de ter o Xcode instalado
+2. Execute `npm run ios`
+3. No Xcode:
+   - Selecione seu projeto no navegador
+   - Selecione o target
+   - Vá em "Signing & Capabilities"
+   - Marque "Automatically manage signing"
+   - Selecione seu time de desenvolvimento (Apple ID)
+
+#### Android
+1. Certifique-se de ter o Android Studio instalado
+2. Configure uma variável de ambiente ANDROID_HOME
+3. Execute `npm run android`
+   - O build de debug será assinado automaticamente
+   - Não é necessário configuração adicional para desenvolvimento
+
+### Solução de Problemas Comuns
+
+#### iOS
+- Se encontrar problemas de assinatura, verifique se:
+  - Você tem uma conta Apple Developer
+  - O Xcode está atualizado
+  - O bundle identifier está correto no app.json
+
+#### Android
+- Se encontrar problemas de build, verifique se:
+  - O Android SDK está instalado corretamente
+  - As variáveis de ambiente estão configuradas
+  - O emulador está rodando ou um dispositivo está conectado
+
+### Limitações de Funcionalidades
+
+#### Funcionalidades de Voz
+- O reconhecimento de voz e funcionalidades relacionadas ao microfone **só funcionam em dispositivos físicos**
+- Emuladores e simuladores podem não suportar estas funcionalidades corretamente
+- Para testar recursos de voz, use um dispositivo físico com:
+  - iOS: Permissões de microfone habilitadas
+  - Android: Permissões de RECORD_AUDIO concedidas
+
 ## 🔒 Segurança
 
 - Implementação de autenticação segura
